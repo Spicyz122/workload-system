@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workload Management System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-[#F9FAFB] text-[#334155] font-['Plus_Jakarta_Sans',sans-serif] antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR -->
+        <aside class="w-64 bg-white border-r border-slate-100 flex flex-col transition-all duration-300 shadow-sm z-20">
+            <div class="p-6 flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-lg shadow-orange-500/20">
+                    <i class="fa-solid fa-chart-pie text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-slate-800 leading-tight">Workload</h1>
+                    <span class="text-xs text-orange-600 font-semibold uppercase tracking-wider">Management</span>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="flex-1 px-4 space-y-1.5 mt-4">
+                <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl text-orange-600 bg-orange-50 transition-all duration-200">
+                    <i class="fa-solid fa-house-chimney w-6 text-center text-base transition-transform duration-200"></i>
+                    <span>หน้าหลัก (Dashboard)</span>
+                </a>
+                <a href="#" onclick="switchTab('workload')" id="nav-workload" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl text-slate-600 hover:bg-slate-50 hover:text-orange-600 transition-all duration-200">
+                    <i class="fa-solid fa-folder-open w-6 text-center text-base transition-transform duration-200"></i>
+                    <span>รายการภาระงาน</span>
+                </a>
+                <a href="#" onclick="switchTab('calendar')" id="nav-calendar" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl text-slate-600 hover:bg-slate-50 hover:text-orange-600 transition-all duration-200">
+                    <i class="fa-solid fa-calendar-days w-6 text-center text-base transition-transform duration-200"></i>
+                    <span>ปฏิทินงาน</span>
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-slate-100">
+                <div class="bg-gradient-to-r from-orange-50 to-amber-50 p-3 rounded-xl border border-orange-100 flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-xs">U</div>
+                    <div class="overflow-hidden">
+                        <p class="text-xs font-bold text-slate-800 truncate">System User</p>
+                        <p class="text-[10px] text-slate-500 truncate">Online Sync</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+            
+            <!-- TOP HEADER -->
+            <header class="h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 px-8 flex items-center justify-between sticky top-0 z-10">
+                <div>
+                    <h2 id="page-title" class="text-xl font-bold text-slate-800">แดชบอร์ดภาพรวม</h2>
+                    <p class="text-xs text-slate-400">ระบบติดตามและบริหารภาระงานประจำวัน</p>
+                </div>
+
+                <!-- Date Filter Window (หน้าต่างเลือกวัน เดือน ปี) -->
+                <div class="flex items-center space-x-3 bg-slate-50 p-1.5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center px-3 space-x-2 text-slate-600 text-sm">
+                        <i class="fa-regular fa-calendar text-orange-500"></i>
+                        <span class="text-xs font-semibold">เลือกช่วงเวลา:</span>
+                    </div>
+                    <input type="date" id="filter-date" onchange="loadData()" class="bg-white border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-orange-500 font-medium shadow-inner">
+                    <button onclick="resetFilter()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-xl text-xs font-semibold transition-all shadow-md shadow-orange-500/20 active:scale-95">
+                        รีเซ็ต
+                    </button>
+                </div>
+            </header>
+
+            <!-- CONTENT BODY -->
+            <div class="p-8 space-y-8 flex-1">
+                
+                <!-- TAB 1: DASHBOARD -->
+                <div id="tab-dashboard" class="space-y-8 animate-fade-in">
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="card-hover bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center space-x-4">
+                            <div class="w-14 h-14 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center text-xl shadow-inner">
+                                <i class="fa-solid fa-list-check"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-400 font-semibold">ภาระงานทั้งหมด</p>
+                                <h3 id="stat-total" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                            </div>
+                        </div>
+                        <div class="card-hover bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center space-x-4">
+                            <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-xl shadow-inner">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-400 font-semibold">กำลังดำเนินการ</p>
+                                <h3 id="stat-inprogress" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                            </div>
+                        </div>
+                        <div class="card-hover bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center space-x-4">
+                            <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl shadow-inner">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-400 font-semibold">เสร็จสิ้นแล้ว</p>
+                                <h3 id="stat-completed" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                            </div>
+                        </div>
+                        <div class="card-hover bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center space-x-4">
+                            <div class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center text-xl shadow-inner">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-400 font-semibold">เกินกำหนด / เร่งด่วน</p>
+                                <h3 id="stat-urgent" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Table Section -->
+                    <div class="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="font-bold text-slate-800 text-lg">ภาระงานล่าสุดในช่วงเวลานี้</h3>
+                            <button onclick="switchTab('workload')" class="text-xs text-orange-600 font-semibold hover:underline">ดูทั้งหมด &rarr;</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-slate-100 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                        <th class="pb-4">ชื่องาน</th>
+                                        <th class="pb-4">ผู้รับผิดชอบ</th>
+                                        <th class="pb-4">กำหนดส่ง</th>
+                                        <th class="pb-4">สถานะ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboard-table-body" class="text-sm divide-y divide-slate-50">
+                                    <!-- Dynamic Data -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: WORKLOAD LIST -->
+                <div id="tab-workload" class="space-y-6 hidden animate-fade-in">
+                    <div class="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="font-bold text-slate-800 text-lg">รายการภาระงานทั้งหมด</h3>
+                            <div class="text-xs text-slate-400">ข้อมูลเชื่อมต่อจาก Google Sheets อัตโนมัติ</div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-slate-100 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                        <th class="pb-4">รหัสงาน</th>
+                                        <th class="pb-4">ชื่องาน</th>
+                                        <th class="pb-4">ผู้รับผิดชอบ</th>
+                                        <th class="pb-4">วันที่เริ่มต้น</th>
+                                        <th class="pb-4">กำหนดส่ง</th>
+                                        <th class="pb-4">สถานะ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="full-table-body" class="text-sm divide-y divide-slate-50">
+                                    <!-- Dynamic Data -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: CALENDAR VIEW -->
+                <div id="tab-calendar" class="space-y-6 hidden animate-fade-in">
+                    <div class="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm text-center py-16">
+                        <div class="w-20 h-20 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 shadow-inner">
+                            <i class="fa-solid fa-calendar-alt"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800">ระบบปฏิทินภาระงานรายวัน</h3>
+                        <p class="text-sm text-slate-400 max-w-md mx-auto mt-2">คุณสามารถใช้ช่องเลือกวันที่ด้านบนขวาของหน้าจอ เพื่อกรองดูภาระงานที่ต้องทำในแต่ละวันได้อย่างสะดวกรวดเร็ว</p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
